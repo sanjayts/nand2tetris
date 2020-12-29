@@ -1,0 +1,44 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/01/DMux4Way.hdl
+
+/**
+ * 4-way demultiplexor:
+ * {a, b, c, d} = {in, 0, 0, 0} if sel == 00
+ *                {0, in, 0, 0} if sel == 01
+ *                {0, 0, in, 0} if sel == 10
+ *                {0, 0, 0, in} if sel == 11
+ */
+
+CHIP DMux4Way {
+    IN in, sel[2];
+    OUT a, b, c, d;
+
+    PARTS:
+	Not(in=sel[0], out=notSel0);
+	Not(in=sel[1], out=notSel1);
+	And(a=sel[0], b=sel[1], out=dOut);
+	And(a=notSel0, b=notSel1, out=aOut);
+	And(a=sel[0], b=notSel1, out=sel0AndNotSel1);
+	And(a=sel[1], b=notSel0, out=sel1AndNotSel0);
+
+	And(a=in, b=dOut, out=d);
+	And(a=in, b=aOut, out=a);
+	And(a=in, b=sel0AndNotSel1, out=b);
+	And(a=in, b=sel1AndNotSel0, out=c);
+}
+
+/*
+Another efficient implementation from -- https://github.com/seebees/nand2tetris/blob/master/projects/01/DMux4Way.hdl
+
+CHIP DMux4WayEfficient {
+    IN in, sel[2];
+    OUT a, b, c, d;
+
+    PARTS:
+	DMux(in=in, sel=sel[1], a=op1, b=op2);
+	DMux(in=op1, sel=sel[0], a=a, b=b);
+	DMux(in=op2, sel=sel[0], a=c, b=d);
+}
+*/
